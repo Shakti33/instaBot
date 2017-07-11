@@ -2,6 +2,7 @@ import requests, urllib
 from termcolor import colored
 from textblob import TextBlob
 from textblob.sentiments import NaiveBayesAnalyzer
+import matplotlib.pyplot as plt
 
 APP_ACCESS_TOKEN = '1438173902.d7f007b.7e005617ecee48659f77e8a25bf3ab26'
 #Token Owner : AVinstaBot.main
@@ -223,7 +224,34 @@ def get_comment_list(insta_username):
 
 
 '''
-Function declaration to make delete negative comments from the recent post
+Function declaration to delete recent comments from the recent post
+'''
+
+
+def delete_comment(insta_username):
+    media_id = get_post_id(insta_username)
+    request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
+    print 'GET request url : %s' % (request_url)
+    comment_info = requests.get(request_url).json()
+    print comment_info
+    if comment_info['meta']['code'] == 200:
+        if len(comment_info['data']):
+            comment_id = comment_info['data'][0]['id']
+            delete_url = (BASE_URL + 'media/%s/comments/%s/?access_token=%s') % (media_id, comment_id, APP_ACCESS_TOKEN)
+            print 'DELETE request url : %s' % (delete_url)
+            delete_info = requests.delete(delete_url).json()
+            if delete_info['meta']['code'] == 200:
+                print 'Comment successfully deleted!\n'
+            else:
+                print 'Unable to delete comment!'
+        else:
+            print 'There are no existing comments on the post!'
+    else:
+        print 'Status code other than 200 received!'
+
+
+'''
+Function declaration to delete negative comments from the recent post
 '''
 
 def delete_negative_comment(insta_username):
@@ -257,6 +285,44 @@ def delete_negative_comment(insta_username):
         print 'Status code other than 200 received!'
 
 
+'''
+Sentimental analysis of online persona using pie chart
+'''
+
+
+def pie_chart_function(insta_username):
+    media_id = get_post_id(insta_username)
+    request_url = (BASE_URL + 'media/%s/comments/?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
+    print 'GET request url : %s' % (request_url)
+    comment_info = requests.get(request_url).json()
+
+    if comment_info['meta']['code'] == 200:
+        if len(comment_info['data']):
+
+            for x in range(0, len(comment_info['data'])):
+                comment_id = comment_info['data'][x]['id']
+                comment_text = comment_info['data'][x]['text']
+                blob = TextBlob(comment_text, analyzer=NaiveBayesAnalyzer())
+                positive_comment = blob.sentiment.p_pos
+                negative_comment = blob.sentiment.p_neg
+                labels = 'Positive Comment', 'Negative Comment'
+                sizes = [positive_comment,negative_comment]
+                colors = [ 'yellowgreen', 'lightcoral',]
+                explode = ( 0, 0)
+
+                plt.pie(sizes, explode=explode, labels=labels, colors=colors,
+                        autopct='%1.1f%%', shadow=True, startangle=140)
+
+                plt.axis('equal')
+                plt.show()
+
+        else:
+            print 'There are no existing comments on the post!'
+    else:
+        print 'Status code other than 200 received!'
+
+
+
 def start_bot():
     while True:
         print '\n'
@@ -271,7 +337,9 @@ def start_bot():
         "Like the recent post of a user",
         "Get a list of comments on the recent post of a user",
         "Make a comment on the recent post of a user",
+        "Delete recent comments from the recent post of a user",
         "Delete negative comments from the recent post of a user",
+        "Sentimental analysis of online persona using pie chart",
         "Exit"
         ]
         for i in range(0,len(choices)):
@@ -301,9 +369,15 @@ def start_bot():
            insta_username = raw_input("\nEnter the username of the user: ")
            post_a_comment(insta_username)
         elif choice=="9":
+            insta_username = raw_input("Enter username of user:")
+            print delete_comment(insta_username)
+        elif choice=="10":
            insta_username = raw_input("\nEnter the username of the user: ")
            delete_negative_comment(insta_username)
-        elif choice == "10":
+        elif choice=="11":
+            insta_username = raw_input("Enter the username")
+            pie_chart_function(insta_username)
+        elif choice == "12":
             exit()
         else:
             print "\nwrong choice"
