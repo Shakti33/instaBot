@@ -218,8 +218,8 @@ def get_comment_list(insta_username):
         for x in comment_list['data']:
             print x['from']['username']
             print x['text']
-        else:
-            print "Unsuccessful"
+    else:
+        print "Unsuccessful"
 
 
 '''
