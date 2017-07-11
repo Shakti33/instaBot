@@ -147,6 +147,11 @@ def get_post_id(insta_username):
         print 'Status code other than 200 received!'
         exit()
 
+'''
+Function declaration to get a list of people who have liked the recent post of a user
+'''
+
+
 def get_like_list(insta_username):
     media_id = get_post_id(insta_username)
     request_url = (BASE_URL + "media/%s/likes?access_token=%s") % (media_id ,APP_ACCESS_TOKEN)
@@ -158,6 +163,8 @@ def get_like_list(insta_username):
            print x['username']
     else:
        print "Unsuccessful"
+
+
 
 '''
 Function declaration to like the recent post of a user
@@ -194,6 +201,12 @@ def post_a_comment(insta_username):
         print "Successfully added a new comment!"
     else:
         print "Unable to add comment. Try again!"
+
+
+'''
+Function declaration to get a list of comments on the recent post of a user
+'''
+
 
 def get_comment_list(insta_username):
     media_id = get_post_id(insta_username)
