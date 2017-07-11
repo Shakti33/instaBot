@@ -1,4 +1,5 @@
 import requests, urllib
+from termcolor import colored
 from textblob import TextBlob
 from textblob.sentiments import NaiveBayesAnalyzer
 
@@ -146,7 +147,17 @@ def get_post_id(insta_username):
         print 'Status code other than 200 received!'
         exit()
 
-
+def get_like_list(insta_username):
+    media_id = get_post_id(insta_username)
+    request_url = (BASE_URL + "media/%s/likes?access_token=%s") % (media_id ,APP_ACCESS_TOKEN)
+    print "Get request url : %s" % (request_url)
+    likes_list = requests.get(request_url).json()
+    print likes_list
+    if len(likes_list['data']):
+       for x in likes_list['data']:
+           print x['username']
+    else:
+       print "Unsuccessful"
 
 '''
 Function declaration to like the recent post of a user
@@ -183,6 +194,20 @@ def post_a_comment(insta_username):
         print "Successfully added a new comment!"
     else:
         print "Unable to add comment. Try again!"
+
+def get_comment_list(insta_username):
+    media_id = get_post_id(insta_username)
+    request_url = (BASE_URL + 'media/%s/comments?access_token=%s') % (media_id, APP_ACCESS_TOKEN)
+    print "Get request url : %s" % (request_url)
+    comment_list = requests.get(request_url).json()
+    print comment_list
+    if len(comment_list['data']):
+        for x in comment_list['data']:
+            print x['from']['username']
+            print x['text']
+        else:
+            print "Unsuccessful"
+
 
 '''
 Function declaration to make delete negative comments from the recent post
@@ -222,48 +247,52 @@ def delete_negative_comment(insta_username):
 def start_bot():
     while True:
         print '\n'
-        print 'Hey! Welcome to instaBot!'
-        print 'Here are your menu options:'
-        print "a.Get your own details\n"
-        print "b.Get details of a user by username\n"
-        print "c.Get your own recent post\n"
-        print "d.Get the recent post of a user by username\n"
-        print "e.Get a list of people who have liked the recent post of a user\n"
-        print "f.Like the recent post of a user\n"
-        print "g.Get a list of comments on the recent post of a user\n"
-        print "h.Make a comment on the recent post of a user\n"
-        print "i.Delete negative comments from the recent post of a user\n"
-        print "j.Exit"
+        print colored('Hey! Welcome to instaBot!',"blue")
+        print colored('Here are your menu options:\n',"blue")
+        choices=[
+        "Get your own details",
+        "Get details of a user by username",
+        "Get your own recent post",
+        "Get the recent post of a user by username",
+        "Get a list of people who have liked the recent post of a user",
+        "Like the recent post of a user",
+        "Get a list of comments on the recent post of a user",
+        "Make a comment on the recent post of a user",
+        "Delete negative comments from the recent post of a user",
+        "Exit"
+        ]
+        for i in range(0,len(choices)):
+            print colored((i + 1), 'red'), colored(choices[i], 'grey')
 
-        choice = raw_input("Enter you choice: ")
-        if choice == "a":
+        choice = raw_input("\nEnter you choice: ")
+        if choice == "1":
             self_info()
-        elif choice == "b":
-            insta_username = raw_input("Enter the username of the user: ")
+        elif choice == "2":
+            insta_username = raw_input("\nEnter the username of the user: ")
             get_user_info(insta_username)
-        elif choice == "c":
+        elif choice == "3":
             get_own_post()
-        elif choice == "d":
-            insta_username = raw_input("Enter the username of the user: ")
+        elif choice == "4":
+            insta_username = raw_input("\nEnter the username of the user: ")
             get_user_post(insta_username)
-        elif choice=="e":
-           insta_username = raw_input("Enter the username of the user: ")
+        elif choice=="5":
+           insta_username = raw_input("\nEnter the username of the user: ")
            get_like_list(insta_username)
-        elif choice=="f":
-           insta_username = raw_input("Enter the username of the user: ")
+        elif choice=="6":
+           insta_username = raw_input("\nEnter the username of the user: ")
            like_a_post(insta_username)
-        elif choice=="g":
-           insta_username = raw_input("Enter the username of the user: ")
+        elif choice=="7":
+           insta_username = raw_input("\nEnter the username of the user: ")
            get_comment_list(insta_username)
-        elif choice=="h":
-           insta_username = raw_input("Enter the username of the user: ")
+        elif choice=="8":
+           insta_username = raw_input("\nEnter the username of the user: ")
            post_a_comment(insta_username)
-        elif choice=="i":
-           insta_username = raw_input("Enter the username of the user: ")
+        elif choice=="9":
+           insta_username = raw_input("\nEnter the username of the user: ")
            delete_negative_comment(insta_username)
-        elif choice == "j":
+        elif choice == "10":
             exit()
         else:
-            print "wrong choice"
+            print "\nwrong choice"
 
 start_bot()
